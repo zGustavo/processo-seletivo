@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>teste api</title>
+</head>
+
+<body>
+    <main>
+
+    </main>
+</body>
+
+<script>
+
+    let registros = [];
+    let years = [];
+    let filmesAnos = [];
+    let filtro;
+    let contador = 0;
+
+
+    async function getContent() {
+        try {
+            let filme = "Spiderman";
+            const response = await fetch('https://jsonmock.hackerrank.com/api/movies/search?Title=' + filme)
+            const data = await response.json()
+            //console.log(data)
+
+            //show(data)
+
+            let totalPages = 0;
+
+            totalPages = data.total_pages;
+
+
+            for (let i = 1; i <= totalPages; i++) {
+                const response = await fetch('https://jsonmock.hackerrank.com/api/movies/search?Title=' + filme + '&page=' + i);
+                const data = await response.json();
+                registros.push(...data.data);
+                console.log(registros)
+            }
+
+            getYears(registros);
+            getByMoviesOrderByYear();
+
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+
+    function getYears(data) {
+        data.forEach(e => {
+            if (!years.some(year => e.Year === year)) {
+                years.push(e.Year);
+            }
+        });
+        console.log(years)
+        return years;
+
+    }
+
+    function getByMoviesOrderByYear() {
+        years.forEach(year => {
+            filtro = registros.filter(movie => movie.Year === year);
+            filmesAnos.push({
+                "year": year,
+                "movies": filtro.length
+            })
+            contador = contador + filtro.length;
+        })
+        filmesAnos.push({
+            "total": contador
+        })
+        let apiResposta = {
+            "moviesByYear":[...filmesAnos]
+        }
+        console.log(apiResposta)
+    }
+
+
+
+    getContent()
+</script>
+
+</html>
